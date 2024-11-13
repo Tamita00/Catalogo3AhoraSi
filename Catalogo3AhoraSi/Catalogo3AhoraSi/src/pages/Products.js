@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { fetchProducts } from '../data/apiManager';
-import { CartContext } from '../context/CartContext'; // Cambiar a CartContext
+import { CartContext } from '../context/CartContext';
 
 const Products = () => {
     const { addToCart } = useContext(CartContext); // Usar CartContext
@@ -9,12 +9,19 @@ const Products = () => {
     const [filteredProducts, setFilteredProducts] = useState([]);
     const [category, setCategory] = useState('');
     const [search, setSearch] = useState('');
+    const [categories, setCategories] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
             const response = await fetchProducts();
             setProducts(response.data.products);
             setFilteredProducts(response.data.products);
+
+            // Extraemos las categorías únicas de los productos
+            const uniqueCategories = [
+                ...new Set(response.data.products.map(product => product.category))
+            ];
+            setCategories(uniqueCategories);
         };
         fetchData();
     }, []);
@@ -108,7 +115,11 @@ const Products = () => {
                     style={styles.categorySelect}
                 >
                     <option value="">Todas las categorías</option>
-                    {/* Aquí puedes agregar opciones de categorías obtenidas desde el contexto o el API */}
+                    {categories.map((categoryItem, index) => (
+                        <option key={index} value={categoryItem}>
+                            {categoryItem}
+                        </option>
+                    ))}
                 </select>
             </div>
 
